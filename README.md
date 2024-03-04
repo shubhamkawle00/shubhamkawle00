@@ -1,5 +1,5 @@
 - 👋 Hi, I’m Shubham Kawale
-- 👀 I’m interested in DevOps
+- 👀 Working as a SRE- Hadoop/DevOps
 - 🌱 I’m currently learning GCP DevOps
 - 💞️ I’m looking to collaborate on DevOps supprot
 - 📫 How to reach me -> shubhamkawle00@gmail.com
