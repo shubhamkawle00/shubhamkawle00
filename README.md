@@ -1,5 +1,5 @@
 - 👋 Hi, I’m Shubham Kawale
-- 👀 Working as a SRE- Hadoop/DevOps
+- 👀 Working as a SRE-DevOps & Big Data
 - 🌱 I’m currently learning GCP DevOps
 - 💞️ I’m looking to collaborate on DevOps supprot
 - 📫 How to reach me -> shubhamkawle00@gmail.com
