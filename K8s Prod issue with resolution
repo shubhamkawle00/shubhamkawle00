@@ -1,0 +1,87 @@
+Pod/container issue -
+
+| #  | Issue                            | Resolution                                                                                              |
+| -- | -------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| 1  | `CrashLoopBackOff`               | Check logs (`kubectl logs`). Look for app error, config/env issue, or liveness probe failure.           |
+| 2  | `ImagePullBackOff`               | Check image repo credentials, tag name, or image existence. Use `kubectl describe pod`.                 |
+| 3  | Pod stuck in `Terminating`       | Use `kubectl delete pod --grace-period=0 --force`. Check if pod uses a PV that's not detaching.         |
+| 4  | Readiness/Liveness probe failing | Review probe path, port, thresholds. Test the endpoint manually.                                        |
+| 5  | Container OOMKilled              | Check container memory limits. Increase memory or optimize app usage.                                   |
+| 6  | Pod stuck in `Pending`           | Run `kubectl describe pod`. Usually due to insufficient node resources or missing PV.                   |
+| 7  | Wrong ENV variables/config       | Use `kubectl exec` to check runtime env. Recheck config maps/secrets.                                   |
+| 8  | Logs not available               | Check logging sidecar/fluentbit config. Ensure stdout logs aren't redirected.                           |
+| 9  | Init container failed            | Check `kubectl logs <pod> -c <init-container>`. Commonly caused by image errors or volume mount issues. |
+| 10 | Multiple restarts of pod         | Indicates crash or resource issue. Use `kubectl describe pod` to trace.                                 |
+
+
+Node/cluster lavel issue -
+
+| #  | Issue                          | Resolution                                                            |
+| -- | ------------------------------ | --------------------------------------------------------------------- |
+| 11 | Node NotReady                  | Check EC2 status, security groups, and kubelet logs.                  |
+| 12 | Node out of disk/memory        | Use `kubectl describe node`. Evict pods or scale node group.          |
+| 13 | Failed to attach/detach volume | Check EBS volume attachment via AWS console.                          |
+| 14 | EBS volume stuck               | Force detach in AWS console. Delete pod using PVC.                    |
+| 15 | Unable to scale nodes          | Check autoscaler logs. Ensure IAM roles and permissions are set.      |
+| 16 | Node draining slow             | Check for `PodDisruptionBudgets`. Use `kubectl drain <node> --force`. |
+| 17 | Cluster Autoscaler not working | Ensure ASG tags and IAM policies are correct. Use CA logs.            |
+| 18 | High CPU/memory usage          | Monitor with Prometheus/Grafana. Tune requests/limits.                |
+| 19 | Incompatible AMI               | Upgrade to compatible EKS-optimized AMI.                              |
+| 20 | CNI plugin errors              | Check `aws-node` DaemonSet logs. Restart or upgrade CNI plugin.       |
+
+
+Networking/Service issue - 
+| #  | Issue                              | Resolution                                                          |
+| -- | ---------------------------------- | ------------------------------------------------------------------- |
+| 21 | Service not accessible             | Check service type, selector labels, and endpoints.                 |
+| 22 | LoadBalancer pending               | Ensure EKS has IAM permissions to provision ELB.                    |
+| 23 | DNS resolution failure             | Check CoreDNS logs. Restart CoreDNS pods.                           |
+| 24 | IP conflict                        | Verify VPC CIDR and pod CIDRs.                                      |
+| 25 | External traffic not reaching pods | Use `kubectl get svc` and describe ELB in AWS.                      |
+| 26 | Inter-pod communication failure    | Check Network Policies or Security Groups.                          |
+| 27 | CoreDNS CrashLoopBackOff           | Review CoreDNS configmap. Upgrade if outdated.                      |
+| 28 | Kube-proxy iptables mode issue     | Check kube-proxy config.                                            |
+| 29 | Istio/Service Mesh routing error   | Use `istioctl proxy-status`, `proxy-config`. Check VirtualServices. |
+| 30 | Internal service slow              | Use `kubectl exec` with `curl` for tracing latency.                 |
+
+
+Storage/volume -
+
+| #  | Issue                          | Resolution                                                    |
+| -- | ------------------------------ | ------------------------------------------------------------- |
+| 31 | PVC stuck in `Pending`         | Check storage class, EBS limits, and availability zone match. |
+| 32 | EFS mount issue                | Validate security group and IAM roles for EFS CSI.            |
+| 33 | Volume mount permission denied | Fix init container or fsGroup settings in pod spec.           |
+| 34 | PVC deleted but PV remains     | Use `kubectl delete pv <pv-name>`.                            |
+| 35 | Slow disk IO                   | Use EBS GP3 or use provisioned IOPS. Monitor with CloudWatch. |
+
+
+security, IAM, cert-
+
+| #  | Issue                              | Resolution                                                      |
+| -- | ---------------------------------- | --------------------------------------------------------------- |
+| 36 | IAM Role not assumed               | Check IAM Role for Service Account (IRSA) annotations.          |
+| 37 | Secret not mounted                 | Ensure secret exists, access is granted, and volume is defined. |
+| 38 | Cert expired (e.g., ingress certs) | Renew TLS certs via cert-manager or manually.                   |
+| 39 | Unauthorized error (401/403)       | Check RBAC policies, service account binding.                   |
+| 40 | Pod access to S3 failing           | Check IRSA policies and trust relationship.                     |
+
+
+CICD issue - 
+| #  | Issue                          | Resolution                                                           |
+| -- | ------------------------------ | -------------------------------------------------------------------- |
+| 41 | Deployment hangs               | Ensure rolling update strategy, enough resources.                    |
+| 42 | Blue-green/canary issues       | Check service selector, routing rules.                               |
+| 43 | Helm chart failed              | Use `helm install --debug`. Validate templates with `helm template`. |
+| 44 | App not coming up after deploy | Rollback with `kubectl rollout undo`. Check new image logs.          |
+| 45 | Rollout stuck                  | `kubectl rollout status deployment/<name>`. Check events and logs.   |
+
+monitoring/logging/alerting -
+
+| #  | Issue                              | Resolution                                              |
+| -- | ---------------------------------- | ------------------------------------------------------- |
+| 46 | Metrics not visible                | Check Prometheus targets, scrape configs.               |
+| 47 | FluentBit/Fluentd not pushing logs | Review output plugin config. Test destination endpoint. |
+| 48 | High alert noise                   | Tune Prometheus alert rules and thresholds.             |
+| 49 | CloudWatch agent failure           | Check IAM permissions and agent config.                 |
+| 50 | Alertmanager not sending emails    | Check SMTP config, receiver setup, and silences.        |
